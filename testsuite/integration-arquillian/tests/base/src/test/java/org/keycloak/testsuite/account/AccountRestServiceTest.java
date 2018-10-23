@@ -36,9 +36,7 @@ import org.keycloak.testsuite.util.UserBuilder;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
@@ -93,80 +91,62 @@ public class AccountRestServiceTest extends AbstractTestRealmKeycloakTest {
     @Test
     public void testUpdateProfile() throws IOException {
         UserRepresentation user = SimpleHttp.doGet(getAccountUrl(null), client).auth(tokenUtil.getToken()).asJson(UserRepresentation.class);
-        String originalFirstName = user.getFirstName();
-        String originalLastName = user.getLastName();
-        String originalEmail = user.getEmail();
-        Map<String, List<String>> originalAttributes = new HashMap<>(user.getAttributes());
+        user.setFirstName("Homer");
+        user.setLastName("Simpsons");
+        user.getAttributes().put("attr1", Collections.singletonList("val1"));
+        user.getAttributes().put("attr2", Collections.singletonList("val2"));
 
-        try {
-            user.setFirstName("Homer");
-            user.setLastName("Simpsons");
-            user.getAttributes().put("attr1", Collections.singletonList("val1"));
-            user.getAttributes().put("attr2", Collections.singletonList("val2"));
+        user = updateAndGet(user);
 
-            user = updateAndGet(user);
+        assertEquals("Homer", user.getFirstName());
+        assertEquals("Simpsons", user.getLastName());
+        assertEquals(2, user.getAttributes().size());
+        assertEquals(1, user.getAttributes().get("attr1").size());
+        assertEquals("val1", user.getAttributes().get("attr1").get(0));
+        assertEquals(1, user.getAttributes().get("attr2").size());
+        assertEquals("val2", user.getAttributes().get("attr2").get(0));
 
-            assertEquals("Homer", user.getFirstName());
-            assertEquals("Simpsons", user.getLastName());
-            assertEquals(2, user.getAttributes().size());
-            assertEquals(1, user.getAttributes().get("attr1").size());
-            assertEquals("val1", user.getAttributes().get("attr1").get(0));
-            assertEquals(1, user.getAttributes().get("attr2").size());
-            assertEquals("val2", user.getAttributes().get("attr2").get(0));
+        // Update attributes
+        user.getAttributes().remove("attr1");
+        user.getAttributes().get("attr2").add("val3");
 
-            // Update attributes
-            user.getAttributes().remove("attr1");
-            user.getAttributes().get("attr2").add("val3");
+        user = updateAndGet(user);
 
-            user = updateAndGet(user);
+        assertEquals(1, user.getAttributes().size());
+        assertEquals(2, user.getAttributes().get("attr2").size());
+        assertThat(user.getAttributes().get("attr2"), containsInAnyOrder("val2", "val3"));
 
-            assertEquals(1, user.getAttributes().size());
-            assertEquals(2, user.getAttributes().get("attr2").size());
-            assertThat(user.getAttributes().get("attr2"), containsInAnyOrder("val2", "val3"));
+        // Update email
+        user.setEmail("bobby@localhost");
+        user = updateAndGet(user);
+        assertEquals("bobby@localhost", user.getEmail());
 
-            // Update email
-            user.setEmail("bobby@localhost");
-            user = updateAndGet(user);
-            assertEquals("bobby@localhost", user.getEmail());
+        user.setEmail("john-doh@localhost");
+        updateError(user, 409, Messages.EMAIL_EXISTS);
 
-            user.setEmail("john-doh@localhost");
-            updateError(user, 409, Messages.EMAIL_EXISTS);
+        user.setEmail("test-user@localhost");
+        user = updateAndGet(user);
+        assertEquals("test-user@localhost", user.getEmail());
 
-            user.setEmail("test-user@localhost");
-            user = updateAndGet(user);
-            assertEquals("test-user@localhost", user.getEmail());
+        // Update username
+        user.setUsername("updatedUsername");
+        user = updateAndGet(user);
+        assertEquals("updatedusername", user.getUsername());
 
-            // Update username
-            user.setUsername("updatedUsername");
-            user = updateAndGet(user);
-            assertEquals("updatedusername", user.getUsername());
+        user.setUsername("john-doh@localhost");
+        updateError(user, 409, Messages.USERNAME_EXISTS);
 
-            user.setUsername("john-doh@localhost");
-            updateError(user, 409, Messages.USERNAME_EXISTS);
+        user.setUsername("test-user@localhost");
+        user = updateAndGet(user);
+        assertEquals("test-user@localhost", user.getUsername());
 
-            user.setUsername("test-user@localhost");
-            user = updateAndGet(user);
-            assertEquals("test-user@localhost", user.getUsername());
+        RealmRepresentation realmRep = adminClient.realm("test").toRepresentation();
+        realmRep.setEditUsernameAllowed(false);
+        adminClient.realm("test").update(realmRep);
 
-            RealmRepresentation realmRep = adminClient.realm("test").toRepresentation();
-            realmRep.setEditUsernameAllowed(false);
-            adminClient.realm("test").update(realmRep);
+        user.setUsername("updatedUsername2");
+        updateError(user, 400, Messages.READ_ONLY_USERNAME);
 
-            user.setUsername("updatedUsername2");
-            updateError(user, 400, Messages.READ_ONLY_USERNAME);
-        } finally {
-            RealmRepresentation realmRep = adminClient.realm("test").toRepresentation();
-            realmRep.setEditUsernameAllowed(true);
-            adminClient.realm("test").update(realmRep);
-
-            user.setFirstName(originalFirstName);
-            user.setLastName(originalLastName);
-            user.setEmail(originalEmail);
-            user.setAttributes(originalAttributes);
-            SimpleHttp.Response response = SimpleHttp.doPost(getAccountUrl(null), client).auth(tokenUtil.getToken()).json(user).asResponse();
-            System.out.println(response.asString());
-            assertEquals(200, response.getStatus());
-        }
 
     }
 
