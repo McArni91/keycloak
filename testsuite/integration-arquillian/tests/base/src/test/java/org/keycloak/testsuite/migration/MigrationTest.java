@@ -91,4 +91,9 @@ public class MigrationTest extends AbstractMigrationTest {
         testMigrationTo4_x(false, false);
     }
 
+    @Test
+    @Migration(versionFrom = "2.2.1.Final")
+    public void migrationInAuthorizationServicesTest() {
+        testDroolsToRulesPolicyTypeMigration();
+    }
 }
