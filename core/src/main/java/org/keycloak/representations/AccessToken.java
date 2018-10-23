@@ -24,7 +24,6 @@ import org.keycloak.representations.idm.authorization.Permission;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -124,7 +123,7 @@ public class AccessToken extends IDToken {
     protected Access realmAccess;
 
     @JsonProperty("resource_access")
-    protected Map<String, Access> resourceAccess;
+    protected Map<String, Access> resourceAccess = new HashMap<String, Access>();
 
     @JsonProperty("authorization")
     protected Authorization authorization;
@@ -135,9 +134,8 @@ public class AccessToken extends IDToken {
     @JsonProperty("scope")
     protected String scope;
 
-    @JsonIgnore
     public Map<String, Access> getResourceAccess() {
-        return resourceAccess == null ? Collections.<String, Access>emptyMap() : resourceAccess;
+        return resourceAccess;
     }
 
     public void setResourceAccess(Map<String, Access> resourceAccess) {
@@ -174,14 +172,10 @@ public class AccessToken extends IDToken {
 
     @JsonIgnore
     public Access getResourceAccess(String resource) {
-        return resourceAccess == null ? null : resourceAccess.get(resource);
+        return resourceAccess.get(resource);
     }
 
     public Access addAccess(String service) {
-        if (resourceAccess == null) {
-            resourceAccess = new HashMap<>();
-        }
-
         Access access = resourceAccess.get(service);
         if (access != null) return access;
         access = new Access();
