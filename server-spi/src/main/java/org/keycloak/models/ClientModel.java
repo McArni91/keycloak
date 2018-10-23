@@ -20,8 +20,6 @@ package org.keycloak.models;
 import java.util.Map;
 import java.util.Set;
 
-import org.keycloak.common.util.ObjectUtil;
-
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
@@ -211,7 +209,7 @@ public interface ClientModel extends ClientScopeModel, RoleContainerModel,  Prot
     @Override
     default String getConsentScreenText() {
         String consentScreenText = ClientScopeModel.super.getConsentScreenText();
-        if (ObjectUtil.isBlank(consentScreenText)) {
+        if (consentScreenText == null) {
             consentScreenText = getClientId();
         }
         return consentScreenText;
