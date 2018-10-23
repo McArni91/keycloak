@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.logging.Logger;
 import org.keycloak.adapters.saml.SamlAuthenticator;
@@ -139,7 +138,9 @@ class KeycloakHttpServerAuthenticationMechanism implements HttpServerAuthenticat
     }
 
     protected void redirectLogout(SamlDeployment deployment, ElytronHttpFacade exchange) {
-        sendRedirect(exchange, deployment.getLogoutPage());
+        String page = deployment.getLogoutPage();
+        sendRedirect(exchange, page);
+        exchange.getResponse().setStatus(302);
     }
 
     private static final Pattern PROTOCOL_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9+.-]*:");
@@ -147,7 +148,7 @@ class KeycloakHttpServerAuthenticationMechanism implements HttpServerAuthenticat
     static void sendRedirect(final ElytronHttpFacade exchange, final String location) {
         if (location == null) {
             LOGGER.warn("Logout page not set.");
-            exchange.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
+            exchange.getResponse().setStatus(302);
             return;
         }
         if (PROTOCOL_PATTERN.matcher(location).find()) {
@@ -160,6 +161,5 @@ class KeycloakHttpServerAuthenticationMechanism implements HttpServerAuthenticat
             String loc = exchange.getURI().getScheme() + "://" + exchange.getURI().getHost() + ":" + exchange.getURI().getPort() + contextPath + location;
             exchange.getResponse().setHeader("Location", loc);
         }
-        exchange.getResponse().setStatus(HttpServletResponse.SC_FOUND);
     }
 }
