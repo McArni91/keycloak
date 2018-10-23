@@ -174,12 +174,6 @@
             "sslClientCert": "x-ssl-client-cert",
             "sslCertChainPrefix": "x-ssl-client-cert-chain",
             "certificateChainLength": 1
-        },
-        "nginx": {
-            "enabled": true,
-            "sslClientCert": "x-ssl-client-cert",
-            "sslCertChainPrefix": "x-ssl-client-cert-chain",
-            "certificateChainLength": 1
         }
     }
 }
