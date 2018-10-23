@@ -17,7 +17,6 @@
  */
 package org.keycloak.adapters.authorization;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -310,15 +309,7 @@ public abstract class AbstractPolicyEnforcer {
         MethodConfig methodConfig = new MethodConfig();
 
         methodConfig.setMethod(request.getMethod());
-        List scopes = new ArrayList<>();
-
-        if (Boolean.TRUE.equals(getEnforcerConfig().getHttpMethodAsScope())) {
-            scopes.add(request.getMethod());
-        } else {
-            scopes.addAll(pathConfig.getScopes());
-        }
-
-        methodConfig.setScopes(scopes);
+        methodConfig.setScopes(pathConfig.getScopes());
         methodConfig.setScopesEnforcementMode(PolicyEnforcerConfig.ScopeEnforcementMode.ANY);
 
         return methodConfig;
