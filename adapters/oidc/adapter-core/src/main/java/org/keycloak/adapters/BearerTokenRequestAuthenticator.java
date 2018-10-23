@@ -74,8 +74,9 @@ public class BearerTokenRequestAuthenticator {
             if (split == null || split.length != 2) continue;
             if (split[0].equalsIgnoreCase("Bearer")) {
                 tokenString = split[1];
-
-                log.debugf("Found [%d] values in authorization header, selecting the first value for Bearer.", (Integer) authHeaders.size());
+                if (log.isDebugEnabled()) {
+                    log.debugf("Found [%s] values in authorization header, selecting the first value for Bearer.", authHeaders.size());
+                }
                 break;
             };
         }
