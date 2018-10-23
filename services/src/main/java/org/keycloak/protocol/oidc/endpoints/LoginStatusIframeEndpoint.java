@@ -76,7 +76,7 @@ public class LoginStatusIframeEndpoint {
             UriInfo uriInfo = session.getContext().getUri();
             RealmModel realm = session.getContext().getRealm();
             ClientModel client = session.realms().getClientByClientId(clientId, realm);
-            if (client != null && client.isEnabled()) {
+            if (client != null) {
                 Set<String> validWebOrigins = WebOriginsUtils.resolveValidWebOrigins(uriInfo, client);
                 validWebOrigins.add(UriUtils.getOrigin(uriInfo.getRequestUri()));
                 if (validWebOrigins.contains("*") || validWebOrigins.contains(origin)) {

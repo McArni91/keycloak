@@ -154,14 +154,10 @@
                     case 'check-sso':
                         if (loginIframe.enable) {
                             setupCheckLoginIframe().success(function() {
-                                checkLoginIframe().success(function (unchanged) {
-                                    if (!unchanged) {
-                                        doLogin(false);
-                                    } else {
-                                        initPromise.setSuccess();
-                                    }
+                                checkLoginIframe().success(function () {
+                                    doLogin(false);
                                 }).error(function () {
-                                    initPromise.setError();
+                                    initPromise.setSuccess();
                                 });
                             });
                         } else {
@@ -195,16 +191,12 @@
 
                         if (loginIframe.enable) {
                             setupCheckLoginIframe().success(function() {
-                                checkLoginIframe().success(function (unchanged) {
-                                    if (unchanged) {
-                                        kc.onAuthSuccess && kc.onAuthSuccess();
-                                        initPromise.setSuccess();
-                                        scheduleCheckIframe();
-                                    } else {
-                                        initPromise.setSuccess();
-                                    }
+                                checkLoginIframe().success(function () {
+                                    kc.onAuthSuccess && kc.onAuthSuccess();
+                                    initPromise.setSuccess();
                                 }).error(function () {
-                                    initPromise.setError();
+                                    setToken(null, null, null);
+                                    initPromise.setSuccess();
                                 });
                             });
                         } else {
@@ -601,7 +593,6 @@
 
                             var tokenResponse = JSON.parse(req.responseText);
                             authSuccess(tokenResponse['access_token'], tokenResponse['refresh_token'], tokenResponse['id_token'], kc.flow === 'standard');
-                            scheduleCheckIframe();
                         } else {
                             kc.onAuthError && kc.onAuthError();
                             promise && promise.setError();
@@ -1085,6 +1076,8 @@
                     loginIframe.iframeOrigin = authUrl.substring(0, authUrl.indexOf('/', 8));
                 }
                 promise.setSuccess();
+
+                setTimeout(check, loginIframe.interval * 1000);
             }
 
             var src = kc.endpoints.checkSessionIframe();
@@ -1111,38 +1104,31 @@
 
                 for (var i = callbacks.length - 1; i >= 0; --i) {
                     var promise = callbacks[i];
-                    if (event.data == 'error') {
-                        promise.setError();
+                    if (event.data == 'unchanged') {
+                        promise.setSuccess();
                     } else {
-                        promise.setSuccess(event.data == 'unchanged');
+                        promise.setError();
                     }
                 }
             };
 
             window.addEventListener('message', messageCallback, false);
 
-            return promise.promise;
-        }
-
-        function scheduleCheckIframe() {
-            if (loginIframe.enable) {
+            var check = function() {
+                checkLoginIframe();
                 if (kc.token) {
-                    setTimeout(function() {
-                        checkLoginIframe().success(function(unchanged) {
-                            if (unchanged) {
-                                scheduleCheckIframe();
-                            }
-                        });
-                    }, loginIframe.interval * 1000);
+                    setTimeout(check, loginIframe.interval * 1000);
                 }
-            }
+            };
+
+            return promise.promise;
         }
 
         function checkLoginIframe() {
             var promise = createPromise(true);
 
             if (loginIframe.iframe && loginIframe.iframeOrigin ) {
-                var msg = kc.clientId + ' ' + (kc.sessionId ? kc.sessionId : '');
+                var msg = kc.clientId + ' ' + kc.sessionId;
                 loginIframe.callbackList.push(promise);
                 var origin = loginIframe.iframeOrigin;
                 if (loginIframe.callbackList.length == 1) {
