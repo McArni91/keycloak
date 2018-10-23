@@ -10,13 +10,13 @@ public class FixedHostnameProvider implements HostnameProvider {
 
     private final KeycloakSession session;
     private final String globalHostname;
-    private final boolean alwaysHttps;
+    private final String scheme;
     private final int httpPort;
     private final int httpsPort;
 
-    public FixedHostnameProvider(KeycloakSession session, boolean alwaysHttps, String globalHostname, int httpPort, int httpsPort) {
+    public FixedHostnameProvider(KeycloakSession session, String scheme, String globalHostname, int httpPort, int httpsPort) {
         this.session = session;
-        this.alwaysHttps = alwaysHttps;
+        this.scheme = scheme;
         this.globalHostname = globalHostname;
         this.httpPort = httpPort;
         this.httpsPort = httpsPort;
@@ -24,7 +24,7 @@ public class FixedHostnameProvider implements HostnameProvider {
 
     @Override
     public String getScheme(UriInfo originalUriInfo) {
-        return alwaysHttps ? "https" : originalUriInfo.getRequestUri().getScheme();
+        return scheme != null ? scheme : originalUriInfo.getRequestUri().getScheme();
     }
 
     @Override
@@ -46,12 +46,6 @@ public class FixedHostnameProvider implements HostnameProvider {
             if (httpsPort == -1) {
                 return originalUriInfo.getRequestUri().getPort();
             } else if (httpsPort == 443) {
-                return -1;
-            } else {
-                return httpsPort;
-            }
-        } else if (alwaysHttps) {
-            if (httpsPort == 443) {
                 return -1;
             } else {
                 return httpsPort;
