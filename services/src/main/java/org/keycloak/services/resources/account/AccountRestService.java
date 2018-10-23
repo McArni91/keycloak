@@ -206,7 +206,7 @@ public class AccountRestService {
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response sessions() {
-        checkAccountApiEnabled();
+        checkAccount2Enabled();
         List<SessionRepresentation> reps = new LinkedList<>();
 
         List<UserSessionModel> sessions = session.sessions().getUserSessions(realm, user);
@@ -244,7 +244,7 @@ public class AccountRestService {
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response sessionsLogout(@QueryParam("current") boolean removeCurrent) {
-        checkAccountApiEnabled();
+        checkAccount2Enabled();
         UserSessionModel userSession = auth.getSession();
 
         List<UserSessionModel> userSessions = session.sessions().getUserSessions(realm, user);
@@ -268,7 +268,7 @@ public class AccountRestService {
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public Response sessionLogout(@QueryParam("id") String id) {
-        checkAccountApiEnabled();
+        checkAccount2Enabled();
         UserSessionModel userSession = session.sessions().getUserSession(realm, id);
         if (userSession != null && userSession.getUser().equals(user)) {
             AuthenticationManager.backchannelLogout(session, userSession, true);
@@ -278,7 +278,7 @@ public class AccountRestService {
 
     @Path("/credentials")
     public AccountCredentialResource credentials() {
-        checkAccountApiEnabled();
+        checkAccount2Enabled();
         return new AccountCredentialResource(session, event, user);
     }
 
@@ -286,8 +286,8 @@ public class AccountRestService {
     // TODO Applications
     // TODO Logs
     
-    private static void checkAccountApiEnabled() {
-        if (!Profile.isFeatureEnabled(Profile.Feature.ACCOUNT_API)) {
+    private static void checkAccount2Enabled() {
+        if (!Profile.isFeatureEnabled(Profile.Feature.ACCOUNT2)) {
             throw new NotFoundException();
         }
     }
