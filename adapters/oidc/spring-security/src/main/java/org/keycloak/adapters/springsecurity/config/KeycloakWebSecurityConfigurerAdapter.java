@@ -65,7 +65,7 @@ public abstract class KeycloakWebSecurityConfigurerAdapter extends WebSecurityCo
     protected AdapterDeploymentContext adapterDeploymentContext() throws Exception {
         AdapterDeploymentContextFactoryBean factoryBean;
         if (keycloakConfigResolver != null) {
-             factoryBean = new AdapterDeploymentContextFactoryBean(new KeycloakSpringConfigResolverWrapper(keycloakConfigResolver));
+             factoryBean = new AdapterDeploymentContextFactoryBean(keycloakConfigResolver);
         }
         else {
             factoryBean = new AdapterDeploymentContextFactoryBean(keycloakConfigFileResource);
