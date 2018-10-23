@@ -7,11 +7,6 @@ import javax.ws.rs.core.UriInfo;
 public class RequestHostnameProvider implements HostnameProvider {
 
     @Override
-    public String getScheme(UriInfo originalUriInfo) {
-        return originalUriInfo.getRequestUri().getScheme();
-    }
-
-    @Override
     public String getHostname(UriInfo originalUriInfo) {
         return originalUriInfo.getBaseUri().getHost();
     }

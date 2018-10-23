@@ -31,7 +31,6 @@ public class KeycloakUriInfo implements UriInfo {
 
     private final UriInfo delegate;
     private final String hostname;
-    private final String scheme;
     private final int port;
 
     private URI absolutePath;
@@ -42,10 +41,8 @@ public class KeycloakUriInfo implements UriInfo {
         this.delegate = delegate;
 
         HostnameProvider hostnameProvider = session.getProvider(HostnameProvider.class);
-        this.scheme = hostnameProvider.getScheme(delegate);
         this.hostname = hostnameProvider.getHostname(delegate);
         this.port = hostnameProvider.getPort(delegate);
-
     }
 
     public UriInfo getDelegate() {
@@ -55,7 +52,7 @@ public class KeycloakUriInfo implements UriInfo {
     @Override
     public URI getRequestUri() {
         if (requestURI == null) {
-            requestURI = delegate.getRequestUriBuilder().scheme(scheme).host(hostname).port(port).build();
+            requestURI = delegate.getRequestUriBuilder().host(hostname).port(port).build();
         }
         return requestURI;
     }
@@ -68,7 +65,7 @@ public class KeycloakUriInfo implements UriInfo {
     @Override
     public URI getAbsolutePath() {
         if (absolutePath == null) {
-            absolutePath = delegate.getAbsolutePathBuilder().scheme(scheme).host(hostname).port(port).build();
+            absolutePath = delegate.getAbsolutePathBuilder().host(hostname).port(port).build();
         }
         return absolutePath;
     }
@@ -81,7 +78,7 @@ public class KeycloakUriInfo implements UriInfo {
     @Override
     public URI getBaseUri() {
         if (baseURI == null) {
-            baseURI = delegate.getBaseUriBuilder().scheme(scheme).host(hostname).port(port).build();
+            baseURI = delegate.getBaseUriBuilder().host(hostname).port(port).build();
         }
         return baseURI;
     }
