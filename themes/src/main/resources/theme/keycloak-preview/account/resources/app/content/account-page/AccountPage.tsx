@@ -15,42 +15,20 @@
  */
 
 import * as React from 'react';
-import {AxiosResponse} from 'axios';
-import {AccountServiceClient} from '../../account-service/account.service';
  
-interface AccountPageProps {
+export interface AccountPageProps {
 }
-
-interface AccountPageState {
-    readonly username: string,
-    readonly firstName?: string,
-    readonly lastName?: string,
-    readonly email?: string,
-    readonly emailVerified?: boolean
-}
-
-/**
- * @author Stan Silvert ssilvert@redhat.com (C) 2018 Red Hat Inc.
- */
-export class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
-    readonly state: AccountPageState = {
-        username: ''
-    };
+ 
+export class AccountPage extends React.Component<AccountPageProps> {
     
     constructor(props: AccountPageProps) {
         super(props);
-        AccountServiceClient.Instance.doGet("/")
-            .then((response: AxiosResponse<AccountPageState>) => {
-                this.setState(response.data);
-                console.log({response});
-            });
     }
 
     render() {
-        const {username, firstName} = this.state;
         return (
             <div>
-                <h2>Hello {username} {firstName}</h2>
+              <h2>Hello Account Page</h2>
             </div>
         );
     }
