@@ -145,19 +145,15 @@
                                         </td>
                                         <td>
                                             <#list permission.scopes as scope>
-                                                <#if scope.scope??>
-                                                    <div class="search-box">
-                                                        <#if scope.scope.displayName??>
-                                                            ${scope.scope.displayName}
-                                                        <#else>
-                                                            ${scope.scope.name}
-                                                        </#if>
-                                                        <button class="close-icon" type="button" id="grant-remove-scope-${resource.name}-${permission.requester.username}-${scope.scope.name}" name="removeScope-${resource.id}-${permission.requester.username}" onclick="removeScopeElm(this.parentNode);document.forms['approveForm-${resource.id}-${permission.requester.username}']['action'].value = 'deny';document.forms['approveForm-${resource.id}-${permission.requester.username}'].submit();"><i class="fa fa-times" aria-hidden="true"></i></button>
-                                                        <input type="hidden" name="permission_id" value="${scope.id}"/>
-                                                    </div>
-                                                <#else>
-                                                    ${msg("anyPermission")}
-                                                </#if>
+                                                <div class="search-box">
+                                                    <#if scope.scope.displayName??>
+                                                        ${scope.scope.displayName}
+                                                    <#else>
+                                                        ${scope.scope.name}
+                                                    </#if>
+                                                    <button class="close-icon" type="button" id="grant-remove-scope-${resource.name}-${permission.requester.username}-${scope.scope.name}" name="removeScope-${resource.id}-${permission.requester.username}" onclick="removeScopeElm(this.parentNode);document.forms['approveForm-${resource.id}-${permission.requester.username}']['action'].value = 'deny';document.forms['approveForm-${resource.id}-${permission.requester.username}'].submit();"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                                    <input type="hidden" name="permission_id" value="${scope.id}"/>
+                                                </div>
                                             </#list>
                                         </td>
                                         <td width="20%" align="middle" style="vertical-align: middle">
@@ -266,7 +262,7 @@
                                             <ul>
                                                 <#list resource.permissions as permission>
                                                     <#list permission.scopes as scope>
-                                                        <#if scope.granted && scope.scope??>
+                                                        <#if scope.granted>
                                                             <li>
                                                                 <#if scope.scope.displayName??>
                                                                     ${scope.scope.displayName}
@@ -274,8 +270,6 @@
                                                                     ${scope.scope.name}
                                                                 </#if>
                                                             </li>
-                                                        <#else>
-                                                            ${msg("anyPermission")}
                                                         </#if>
                                                     </#list>
                                                 </#list>
@@ -361,14 +355,10 @@
                                                     <#list resource.permissions as permission>
                                                         <#list permission.scopes as scope>
                                                             <li>
-                                                                <#if scope.scope??>
-                                                                    <#if scope.scope.displayName??>
-                                                                        ${scope.scope.displayName}
-                                                                    <#else>
-                                                                        ${scope.scope.name}
-                                                                    </#if>
+                                                                <#if scope.scope.displayName??>
+                                                                    ${scope.scope.displayName}
                                                                 <#else>
-                                                                    ${msg("anyPermission")}
+                                                                    ${scope.scope.name}
                                                                 </#if>
                                                             </li>
                                                         </#list>
