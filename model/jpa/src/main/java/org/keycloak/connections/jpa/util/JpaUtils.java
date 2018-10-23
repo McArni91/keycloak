@@ -17,6 +17,7 @@
 
 package org.keycloak.connections.jpa.util;
 
+import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.jpa.boot.internal.ParsedPersistenceXmlDescriptor;
 import org.hibernate.jpa.boot.internal.PersistenceXmlParser;
 import org.hibernate.jpa.boot.spi.Bootstrap;
@@ -44,9 +45,10 @@ public class JpaUtils {
         return (schema==null) ? tableName : schema + "." + tableName;
     }
 
-    public static EntityManagerFactory createEntityManagerFactory(KeycloakSession session, String unitName, Map<String, Object> properties, boolean jta) {
+    public static EntityManagerFactory createEntityManagerFactory(KeycloakSession session, String unitName, Map<String, Object> properties, ClassLoader classLoader, boolean jta) {
         PersistenceUnitTransactionType txType = jta ? PersistenceUnitTransactionType.JTA : PersistenceUnitTransactionType.RESOURCE_LOCAL;
-        List<ParsedPersistenceXmlDescriptor> persistenceUnits = PersistenceXmlParser.locatePersistenceUnits(properties);
+        PersistenceXmlParser parser = new PersistenceXmlParser(new ClassLoaderServiceImpl(classLoader), txType);
+        List<ParsedPersistenceXmlDescriptor> persistenceUnits = parser.doResolve(properties);
         for (ParsedPersistenceXmlDescriptor persistenceUnit : persistenceUnits) {
             if (persistenceUnit.getName().equals(unitName)) {
                 List<Class<?>> providedEntities = getProvidedEntities(session);
@@ -55,10 +57,10 @@ public class JpaUtils {
                     persistenceUnit.addClasses(entityClass.getName());
                 }
                 // Now build the entity manager factory, supplying a proxy classloader, so Hibernate will be able
-                // to find and load the extra provided entities.
+                // to find and load the extra provided entities. Set the provided classloader as parent classloader.
                 persistenceUnit.setTransactionType(txType);
                 return Bootstrap.getEntityManagerFactoryBuilder(persistenceUnit, properties,
-                        new ProxyClassLoader(providedEntities)).build();
+                        new ProxyClassLoader(providedEntities, classLoader)).build();
             }
         }
         throw new RuntimeException("Persistence unit '" + unitName + "' not found");

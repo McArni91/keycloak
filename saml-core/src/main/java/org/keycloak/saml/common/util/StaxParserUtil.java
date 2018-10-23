@@ -76,8 +76,7 @@ public class StaxParserUtil {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(new StreamSource(sch));
             Validator validator = schema.newValidator();
-            StAXSource stAXSource = new StAXSource(xmlEventReader);
-            validator.validate(stAXSource);
+            validator.validate(new StAXSource(xmlEventReader));
         } catch (Exception e) {
             throw logger.parserException(e);
         }

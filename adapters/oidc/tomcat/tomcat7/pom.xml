@@ -38,6 +38,7 @@
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
+            <version>${jboss.logging.version}</version>
         </dependency>
 		<dependency>
 			<groupId>org.keycloak</groupId>
