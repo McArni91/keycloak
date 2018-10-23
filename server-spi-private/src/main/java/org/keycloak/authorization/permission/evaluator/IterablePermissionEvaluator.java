@@ -30,7 +30,6 @@ import org.keycloak.authorization.permission.ResourcePermission;
 import org.keycloak.authorization.policy.evaluation.DecisionPermissionCollector;
 import org.keycloak.authorization.policy.evaluation.EvaluationContext;
 import org.keycloak.authorization.policy.evaluation.PolicyEvaluator;
-import org.keycloak.authorization.store.StoreFactory;
 import org.keycloak.representations.idm.authorization.AuthorizationRequest;
 import org.keycloak.representations.idm.authorization.Permission;
 
@@ -53,12 +52,8 @@ class IterablePermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public Decision evaluate(Decision decision) {
-        StoreFactory storeFactory = authorizationProvider.getStoreFactory();
-
         try {
             Map<Policy, Map<Object, Decision.Effect>> decisionCache = new HashMap<>();
-
-            storeFactory.setReadOnly(true);
 
             while (this.permissions.hasNext()) {
                 this.policyEvaluator.evaluate(this.permissions.next(), authorizationProvider, executionContext, decision, decisionCache);
@@ -67,10 +62,7 @@ class IterablePermissionEvaluator implements PermissionEvaluator {
             decision.onComplete();
         } catch (Throwable cause) {
             decision.onError(cause);
-        } finally {
-            storeFactory.setReadOnly(false);
         }
-
         return decision;
     }
 
