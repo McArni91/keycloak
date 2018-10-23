@@ -43,7 +43,7 @@ public class ApplianceBootstrap {
     }
 
     public boolean isNewInstall() {
-        if (session.realms().getRealm(Config.getAdminRealm()) != null) {
+        if (session.realms().getRealms().size() > 0) {
             return false;
         } else {
             return true;
