@@ -47,7 +47,7 @@ public class ClientInitiatedAccountLinkServlet extends HttpServlet {
             String realm = request.getParameter("realm");
             KeycloakSecurityContext session = (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
             AccessToken token = session.getToken();
-            String clientId = token.getIssuedFor();
+            String clientId = token.getAudience()[0];
             String nonce = UUID.randomUUID().toString();
             MessageDigest md = null;
             try {

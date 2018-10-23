@@ -74,9 +74,8 @@ public class AdapterTokenVerifier {
             IDToken idToken = TokenVerifier.create(idTokenString, IDToken.class).getToken();
             TokenVerifier<IDToken> idTokenVerifier = TokenVerifier.createWithoutSignature(idToken);
 
-            // Always verify audience and azp on IDToken
+            // Always verify audience on IDToken
             idTokenVerifier.audience(deployment.getResourceName());
-            idTokenVerifier.issuedFor(deployment.getResourceName());
 
             idTokenVerifier.verify();
             return new VerifiedTokens(accessToken, idToken);

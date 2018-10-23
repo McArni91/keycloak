@@ -126,7 +126,7 @@ public class LinkAndExchangeServlet extends HttpServlet {
             AccessToken token = session.getToken();
             String tokenString = session.getTokenString();
 
-            String clientId = token.getIssuedFor();
+            String clientId = token.getAudience()[0];
             String linkUrl = null;
             try {
                 AccessTokenResponse response = doTokenExchange(realm, tokenString, provider,  clientId, "password");
@@ -176,7 +176,7 @@ public class LinkAndExchangeServlet extends HttpServlet {
                 String realm = request.getParameter("realm");
                 KeycloakSecurityContext session = (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
                 AccessToken token = session.getToken();
-                String clientId = token.getIssuedFor();
+                String clientId = token.getAudience()[0];
                 String tokenString = session.getTokenString();
                 AccessTokenResponse response = doTokenExchange(realm, tokenString, provider,  clientId, "password");
                 error = (String)response.getOtherClaims().get("error");

@@ -64,8 +64,7 @@ public class KeycloakOIDCIdentityProvider extends OIDCIdentityProvider {
 
     @Override
     protected void processAccessTokenResponse(BrokeredIdentityContext context, AccessTokenResponse response) {
-        // Don't verify audience on accessToken as it may not be there. It was verified on IDToken already
-        JsonWebToken access = validateToken(response.getToken(), true);
+        JsonWebToken access = validateToken(response.getToken());
         context.getContextData().put(VALIDATED_ACCESS_TOKEN, access);
     }
 
